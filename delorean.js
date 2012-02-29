@@ -420,7 +420,7 @@
         chart.children().remove();
 
 
-        r = Raphael(chart.get(0), options.width, options.height);
+        r = Raphael(chart.get(0), options.width = options_['width'] == null ? chart.width() : options_['width'], options.height = options_['height'] == null ? chart.height() : options_['height']);
       },
       distill: function(force) {
         distillData(force);
