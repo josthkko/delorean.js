@@ -142,10 +142,28 @@
     }
 
     function tooltip(event, values) {
+
       if (!$('#tooltip').length) {
-        $('body').append('<div id="tooltip"><div id="tooltip_inner">' + values.join('<br />') + '</div></div>');
+        $('body').append('<div id="tooltip"><div id="tooltip_inner">' + options.line_labels  + values.join('<br />') + '</div></div>');
+		for(var s=0 ; s < values.length;s++)
+		{
+			if(options.line_labels[s])
+				$('#tooltip_inner').append('<text style="color: ' + options.line_colors[s] + ';" >' + options.line_labels[s] + '</text>' + ' : ' + values[s] );
+			else
+				$('#tooltip_inner').append('<text style="color: ' + options.line_colors[s] + ';" > -- </text>' + ' : ' + values[s] );
+			$('#tooltip_inner').append('<br />');
+		}
       } else {
-        $('#tooltip_inner').html(values.join('<br />'));
+      		$('#tooltip_inner').html("");
+		for(var s=0 ; s < values.length;s++)
+		{
+			if(options.line_labels[s])
+				$('#tooltip_inner').append('<text style="color: ' + options.line_colors[s] + ';" >' + options.line_labels[s] + '</text>' + ' : ' + values[s] );
+			else
+				$('#tooltip_inner').append('<text style="color: ' + options.line_colors[s] + ';" > -- </text>' + ' : ' + values[s] );
+			
+			$('#tooltip_inner').append('<br />');
+		}
       }
 
       var svg = $(event.target.parentNode);
