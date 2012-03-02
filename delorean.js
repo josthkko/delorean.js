@@ -46,8 +46,13 @@
       display_y_grid: true,
       stroke_width: 4,
       stroke_width_dense: 2,
+      stroke_width_denser: 1,
       point_size: 5,
+      point_size_dense: 2,
+      point_size_denser: 0,
       point_size_hover: 7,
+      point_size_hover_dense: 4,
+      point_size_hover_denser: 3,
       enable_tooltips: false,
       verify_libraries: true
     };
@@ -336,7 +341,7 @@
       var margin_left = options.margin_left;
       var margin_bottom = options.margin_bottom;
       var margin_top = options.margin_top;
-      var stroke_width = dates.length > 45 ? options.stroke_width_dense : options.stroke_width;
+      var stroke_width = dates.length > 45 ? (dates.length > 90 ? options.stroke_width_denser : options.stroke_width_dense ) : options.stroke_width;
 
       for (var k = 0, kk = values[0].length; k < kk; k++) {
 				var c = options.line_colors[k];
@@ -369,11 +374,11 @@
         var first_point = i === 0;
 
         if (dates_length > 45 && dates_length <= 90) {
-          point_size = 3;
-          point_size_hover = 5;
+          point_size = options.point_size_dense;
+          point_size_hover = options.point_size_hover_dense;
         } else if (dates_length > 90) {
-          point_size = 0;
-          point_size_hover = 3;
+          point_size = options.point_size_denser;
+          point_size_hover = options.point_size_hover_denser;
         }
 
         for (var j = 0; j < values[i].length; j++) {
