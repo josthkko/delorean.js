@@ -132,17 +132,19 @@
     }
 
     function displayValue(value, precision) {
-      if (value >= 0 && value < 1000) {
-        return value.toString();
+      var append = "";
+      if(value < 0) { var append = "-"; value = value*(-1);}
+      if (/*value >= 0 &&*/ value < 1000) {
+        return append + value.toString();
       } else if (value >= 1000 && value < 1000000) {
-        return (value / 1000).toFixed(precision) + 'K';
+        return append + (value / 1000).toFixed(precision) + 'K';
       } else if (value >= 1000000) {
-        return (value / 1000000).toFixed(precision) + 'M';
+        return append + (value / 1000000).toFixed(precision) + 'M';
       }
     }
 
     function tooltip(event, values) {
-
+	//display tool tip with line labels if they are defined.
       if (!$('#tooltip').length) {
         $('body').append('<div id="tooltip"><div id="tooltip_inner">' + options.line_labels  + values.join('<br />') + '</div></div>');
 		for(var s=0 ; s < values.length;s++)
@@ -279,18 +281,24 @@
     };
 
     // This draws the Y Axis (the scale).
-    Raphael.fn.drawYAxis = function(max) {
-      var display = options.label_display_count + 1;
-      var max_more = max * 1.33;
-      var max_less = max / display;
+    Raphael.fn.drawYAxis = function(max,min) {
+      if(min > 0)
+      	min = 0;
+      	
+      var display = (options.label_display_count)+1;
+      var display_intact = display;
+      var max_more = max-min * 1.33;
+      var max_less = (max-min)/display;
+      var min_more = min;
+      var min_less = min / display;
       var offset_x = options.label_offset;
       var y_spacing = Math.round((options.height - options.margin_bottom - options.margin_top) / display);
 
       // Start from lower number and go higher.
       var offset_y = y_spacing * display;
 
-      for (var scale = 0; scale < max_more; scale += max_less) {
-        if (display >= 1 && scale > 0) {
+      for (var scale = min_more; scale < max_more; scale += max_less) {
+        if (display >= 1 && display < display_intact) {
 
           if (options.display_y_grid) {
             for (var j = 0; j <= 1; j++) {
@@ -319,7 +327,9 @@
       }
     };
 
-    Raphael.fn.drawChart = function(X, Y) {
+    Raphael.fn.drawChart = function(X, Y, max, min) {
+      if(min > 0)
+      	min = 0;
       var line_paths = [];
       var dates = _(data).keys();
       var values = _(data).values();
@@ -368,11 +378,11 @@
 
         for (var j = 0; j < values[i].length; j++) {
           var value = values[i][j];
-          var y = Math.round(options.height - margin_bottom - Y * value);
+          var y = Math.round(options.height - margin_bottom - Y * (value-min));
 
-          if (value < 0) {
+          /*if (value < 0) {
             y = Math.round(options.height - margin_bottom - Y * 0);
-          }
+          }*/
 
           if (dates_length <= 45) {
             line_paths[j][(first_point ? 'moveTo' : 'cplineTo')](x, y, 10);
@@ -445,22 +455,25 @@
       },
       render: function() {
         var max;
+        var min;
         var dates = _(data).keys();
         var values = _(data).values();
 
         if (_.isArray(values[0])) {
           max = _(_(values).flatten()).max();
+          min = _(_(values).flatten()).min();
         } else {
           max = _(values).max();
+          min = _(values).min();
           _.each(data, function(value, key) { data[key] = [value] });
         }
 
         var X = (options.width - (options.label_offset + 15)) / dates.length;
-        var Y = (options.height - options.margin_bottom - options.margin_top) / max;
+        var Y = (options.height - options.margin_bottom - options.margin_top) / (max+ (min < 0 ? Math.abs(min): 0));
 
         r.drawXAxis(dates, X);
-        r.drawChart(X, Y);
-        r.drawYAxis(max);
+        r.drawChart(X, Y, max , min);
+        r.drawYAxis(max,min);
       }
     };
   };
