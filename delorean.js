@@ -25,6 +25,7 @@
       ],
       line_labels: [],
       date_format: '%m/%d',
+      long_date_format: '%Y-%m-%d',
       width: 700,
       height: 200,
       label_display_count: 3,
@@ -148,31 +149,36 @@
       }
     }
 
-    function tooltip(event, values) {
-	//display tool tip with line labels if they are defined.
+    function tooltip(event, values, date) {
+	//display tool tip with date and line labels if they are defined.
+	parsed_date = parseDate(date[0]).strftime(options.long_date_format);
       if (!$('#tooltip').length) {
-        $('body').append('<div id="tooltip"><div id="tooltip_inner">' + options.line_labels  + values.join('<br />') + '</div></div>');
+        $('body').append('<div id="tooltip"><div id="tooltip_inner"><div id=tooltip_date >' + parsed_date + '</div>' + options.line_labels  + values.join('<br />') + '</div></div>');
+        	$('#tooltip_inner').append('<div id=tooltip_date >' + parsed_date + '</div>');
 		for(var s=0 ; s < values.length;s++)
 		{
 			if(options.line_labels[s])
-				$('#tooltip_inner').append('<text style="color: ' + options.line_colors[s] + ';" >' + options.line_labels[s] + '</text>' + ' : ' + values[s] );
+				$('#tooltip_inner').append('<div class=tooltip_text ><text class=tooltip_text style="color: ' + options.line_colors[s] + ';" >' + options.line_labels[s] + '</text>' + ' : ' + values[s] + '</div>');
 			else
-				$('#tooltip_inner').append('<text style="color: ' + options.line_colors[s] + ';" > -- </text>' + ' : ' + values[s] );
+				$('#tooltip_inner').append('<div class=tooltip_text ><text class=tooltip_text style="color: ' + options.line_colors[s] + ';" > -- </text>' + ' : ' + values[s]  + '</div>');
 			$('#tooltip_inner').append('<br />');
 		}
+		
       } else {
       		$('#tooltip_inner').html("");
+      		$('#tooltip_inner').append('<div id=tooltip_date >' + parsed_date + '</div>');
 		for(var s=0 ; s < values.length;s++)
 		{
 			if(options.line_labels[s])
-				$('#tooltip_inner').append('<text style="color: ' + options.line_colors[s] + ';" >' + options.line_labels[s] + '</text>' + ' : ' + values[s] );
+				$('#tooltip_inner').append('<div class=tooltip_text ><text  style="color: ' + options.line_colors[s] + ';" >' + options.line_labels[s] + '</text>' + ' : ' + values[s] + '</div>');
 			else
-				$('#tooltip_inner').append('<text style="color: ' + options.line_colors[s] + ';" > -- </text>' + ' : ' + values[s] );
+				$('#tooltip_inner').append('<div class=tooltip_text ><text class=tooltip_text style="color: ' + options.line_colors[s] + ';" > -- </text>' + ' : ' + values[s]  + '</div>');
 			
 			$('#tooltip_inner').append('<br />');
 		}
+		
       }
-
+      
       var svg = $(event.target.parentNode);
       var svg_x = svg.offset().left + svg.outerWidth();
       var svg_y = svg.offset().top + svg.outerHeight();
@@ -358,6 +364,7 @@
       var layer = this.set();
       var point_array = [];
       var values_array = [];
+      var dates_array = [];
       var tooltip_visible = false;
       var leave_timer = null;
       var dates_length = dates.length;
@@ -367,6 +374,7 @@
 
         point_array[x] = [];
         values_array[x] = [];
+        dates_array[x] = [];
 
         var stroke_color = '#fff';
         var point_size = options.point_size;
@@ -383,7 +391,9 @@
 
         for (var j = 0; j < values[i].length; j++) {
           var value = values[i][j];
-          var y = Math.round(options.height - margin_bottom - Y * (value-min));
+          var date = dates[i];
+	  //calculate position and if string set position to min
+          var y = Math.round(options.height - margin_bottom - Y * (isNaN(value) ? 0 : value-min));
 
           /*if (value < 0) {
             y = Math.round(options.height - margin_bottom - Y * 0);
@@ -405,15 +415,16 @@
           point.insertAfter(line_paths[j]);
           point_array[x].push(point);
           values_array[x].push(value);
+          dates_array[x].push(date);
         }
-
+	
         layer.push(this.rect(x, 0, X, options.height - margin_bottom).attr({
           'stroke': 'none',
           'fill': '#fff',
           'opacity': 0
         }));
 
-        (function(rect, points, x, values) {
+        (function(rect, points, x, values, date) {
           rect.hover(function() {
             _.each(points[x], function(point) {
               point.attr({
@@ -430,10 +441,11 @@
             $('#tooltip').hide();
           }).mousemove(function(event) {
             if(options.enable_tooltips) {
-              tooltip(event, values[x]);
+              tooltip(event, values[x] , date[x]);
+              
             }
           });
-        })(layer[layer.length - 1], point_array, x, values_array);
+        })(layer[layer.length - 1], point_array, x, values_array, dates_array);
       }
     };
 
@@ -463,13 +475,19 @@
         var min;
         var dates = _(data).keys();
         var values = _(data).values();
+        var values_filtered = [];
+	//filter values in case there is text somewhere
+	
 
+        
         if (_.isArray(values[0])) {
-          max = _(_(values).flatten()).max();
-          min = _(_(values).flatten()).min();
+ 	  values_filtered = _(values).flatten().filter(function(x){return typeof x == 'number'});
+          max = _(_(values_filtered).flatten()).max();
+          min = _(_(values_filtered).flatten()).min();
         } else {
-          max = _(values).max();
-          min = _(values).min();
+  	  values_filtered = values.filter(function(x){return typeof x == 'number'});
+          max = _(values_filtered).max();
+          min = _(values_filtered).min();
           _.each(data, function(value, key) { data[key] = [value] });
         }
 
