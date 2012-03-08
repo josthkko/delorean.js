@@ -383,7 +383,8 @@
 
         for (var j = 0; j < values[i].length; j++) {
           var value = values[i][j];
-          var y = Math.round(options.height - margin_bottom - Y * (value-min));
+	  //calculate position and if string set position to min
+          var y = Math.round(options.height - margin_bottom - Y * (isNaN(value) ? 0 : value-min));
 
           /*if (value < 0) {
             y = Math.round(options.height - margin_bottom - Y * 0);
@@ -463,13 +464,19 @@
         var min;
         var dates = _(data).keys();
         var values = _(data).values();
+        var values_filtered = [];
+	//filter values in case there is text somewhere
+	
 
+        
         if (_.isArray(values[0])) {
-          max = _(_(values).flatten()).max();
-          min = _(_(values).flatten()).min();
+ 	  values_filtered = _(values).flatten().filter(function(x){return typeof x == 'number'});
+          max = _(_(values_filtered).flatten()).max();
+          min = _(_(values_filtered).flatten()).min();
         } else {
-          max = _(values).max();
-          min = _(values).min();
+  	  values_filtered = values.filter(function(x){return typeof x == 'number'});
+          max = _(values_filtered).max();
+          min = _(values_filtered).min();
           _.each(data, function(value, key) { data[key] = [value] });
         }
 
