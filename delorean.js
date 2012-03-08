@@ -153,7 +153,7 @@
 	//display tool tip with date and line labels if they are defined.
 	parsed_date = parseDate(date[0]).strftime(options.long_date_format);
       if (!$('#tooltip').length) {
-        $('body').append('<div id="tooltip"><div id="tooltip_inner"><div id=tooltip_date >' + parsed_date + '</div>' + options.line_labels  + values.join('<br />') + '</div></div>');
+        $('body').append('<div id="tooltip"><div id="tooltip_inner"><div id="tooltip_date">' + parsed_date + '</div>' + options.line_labels  + values.join('<br />') + '</div></div>');
         	$('#tooltip_inner').append('<div id=tooltip_date >' + parsed_date + '</div>');
 		for(var s=0 ; s < values.length;s++)
 		{
@@ -169,12 +169,14 @@
       		$('#tooltip_inner').append('<div id=tooltip_date >' + parsed_date + '</div>');
 		for(var s=0 ; s < values.length;s++)
 		{
-			if(options.line_labels[s])
-				$('#tooltip_inner').append('<div class=tooltip_text ><text  style="color: ' + options.line_colors[s] + ';" >' + options.line_labels[s] + '</text>' + ' : ' + values[s] + '</div>');
-			else
-				$('#tooltip_inner').append('<div class=tooltip_text ><text class=tooltip_text style="color: ' + options.line_colors[s] + ';" > -- </text>' + ' : ' + values[s]  + '</div>');
-			
-			$('#tooltip_inner').append('<br />');
+      if(values[s] !== null) {
+  			if(options.line_labels[s])
+  				$('#tooltip_inner').append('<div class=tooltip_text ><text  style="color: ' + options.line_colors[s] + ';" >' + options.line_labels[s] + '</text>' + ' : ' + values[s] + '</div>');
+  			else
+  				$('#tooltip_inner').append('<div class=tooltip_text ><text class=tooltip_text style="color: ' + options.line_colors[s] + ';" > -- </text>' + ' : ' + values[s]  + '</div>');
+  			
+  			$('#tooltip_inner').append('<br />');
+      }
 		}
 		
       }
@@ -393,7 +395,7 @@
           var value = values[i][j];
           var date = dates[i];
 	  //calculate position and if string set position to min
-          var y = Math.round(options.height - margin_bottom - Y * (isNaN(value) ? 0 : value-min));
+          var y = Math.round(options.height - margin_bottom - Y * ((isNaN(value) || value === null) ? 0 : value-min));
 
           /*if (value < 0) {
             y = Math.round(options.height - margin_bottom - Y * 0);
