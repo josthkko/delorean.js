@@ -284,7 +284,7 @@
       while (i--) {
         x = Math.round(X * _.indexOf(dates, date_labels[i], true)) + (options.label_offset + 15);
         date = parseDate(date_labels[i]).strftime(options.date_format);
-        this.text(x, y_position, date).attr(options.text_date).toBack();
+        this.text(x, y_position+4, date).attr(options.text_date).toBack();
 
         if (options.display_x_grid) {
           this.path(["M", x, y_position, "V", 0]).attr({'stroke': options.grid_color}).toBack();
