@@ -31,7 +31,7 @@
       label_display_count: 3,
       label_offset: 15,
       margin_left: 5,
-      margin_bottom: 5,
+      margin_bottom: 20,
       margin_top: 5,
       text_date: {
         'fill': '#999',
@@ -160,7 +160,7 @@
 			if(options.line_labels[s])
 				$('#tooltip_inner').append('<div class=tooltip_text ><text class=tooltip_text style="color: ' + options.line_colors[s] + ';" >' + options.line_labels[s] + '</text>' + ' : ' + values[s] + '</div>');
 			else
-				$('#tooltip_inner').append('<div class=tooltip_text ><text class=tooltip_text style="color: ' + options.line_colors[s] + ';" > -- </text>' + ' : ' + values[s]  + '</div>');
+				$('#tooltip_inner').append('<div class=tooltip_text ><text class=tooltip_text style="color: ' + options.line_colors[s] + ';" > -- ' + ' : ' + values[s]  + '</text></div>');
 			$('#tooltip_inner').append('<br />');
 		}
 		
@@ -173,7 +173,7 @@
   			if(options.line_labels[s])
   				$('#tooltip_inner').append('<div class=tooltip_text ><text  style="color: ' + options.line_colors[s] + ';" >' + options.line_labels[s] + '</text>' + ' : ' + values[s] + '</div>');
   			else
-  				$('#tooltip_inner').append('<div class=tooltip_text ><text class=tooltip_text style="color: ' + options.line_colors[s] + ';" > -- </text>' + ' : ' + values[s]  + '</div>');
+  				$('#tooltip_inner').append('<div class=tooltip_text ><text class=tooltip_text style="color: ' + options.line_colors[s] + ';" > -- ' + ' : ' + values[s]  + '</text></div>');
   			
   			$('#tooltip_inner').append('<br />');
       }
@@ -284,7 +284,7 @@
       while (i--) {
         x = Math.round(X * _.indexOf(dates, date_labels[i], true)) + (options.label_offset + 15);
         date = parseDate(date_labels[i]).strftime(options.date_format);
-        this.text(x, y_position+4, date).attr(options.text_date).toBack();
+        this.text(x, y_position, date).attr(options.text_date).toBack();
 
         if (options.display_x_grid) {
           this.path(["M", x, y_position, "V", 0]).attr({'stroke': options.grid_color}).toBack();
