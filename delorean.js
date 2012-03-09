@@ -410,7 +410,7 @@
 	  	
 	  if(value !== null){
 		  if (dates_length <= 45) {
-		    line_paths[j][(first_point ? 'moveTo' : 'cplineTo')](x, y, 1);
+		    line_paths[j][(first_point ? 'moveTo' : 'cplineTo')](x, y, 12);
 		  } else if (dates_length <= 90) {
 		    line_paths[j][(first_point ? 'moveTo' : 'cplineTo')](x, y, 4);
 		  } else {
