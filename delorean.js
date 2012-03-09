@@ -393,26 +393,36 @@
 
         for (var j = 0; j < values[i].length; j++) {
           var value = values[i][j];
+          var value_next;
           var date = dates[i];
 	  //calculate position and if string set position to min
           var y = Math.round(options.height - margin_bottom - Y * ((isNaN(value) || value === null) ? 0 : value-min));
-
+	  var notnull_exists = 0;
           /*if (value < 0) {
             y = Math.round(options.height - margin_bottom - Y * 0);
           }*/
+          
+          //if line with null items then draw just dots for text
+	  if(value === null){
+	  	line_paths[j].attr({'stroke-width': 0});
+	  }
 
-          if (dates_length <= 45) {
-            line_paths[j][(first_point ? 'moveTo' : 'cplineTo')](x, y, 10);
-          } else if (dates_length <= 90) {
-            line_paths[j][(first_point ? 'moveTo' : 'cplineTo')](x, y, 4);
-          } else {
-            line_paths[j][(first_point ? 'moveTo' : 'cplineTo')](x, y, 1);
+	  	
+	  if(value !== null){
+		  if (dates_length <= 45) {
+		    line_paths[j][(first_point ? 'moveTo' : 'cplineTo')](x, y, 1);
+		  } else if (dates_length <= 90) {
+		    line_paths[j][(first_point ? 'moveTo' : 'cplineTo')](x, y, 4);
+		  } else {
+		    line_paths[j][(first_point ? 'moveTo' : 'cplineTo')](x, y, 1);
+		  }
           }
-
-          var point = this.circle(x, y, point_size).attr({
-            fill: options.line_colors[j],
-            stroke: stroke_color
-          });
+	  if(value !== null){ //don't draw points for null values
+		  var point = this.circle(x, y, point_size).attr({
+		    fill: options.line_colors[j],
+		    stroke: stroke_color
+		  });
+          }
 
           point.insertAfter(line_paths[j]);
           point_array[x].push(point);
